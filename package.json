@@ -1,0 +1,22 @@
+{
+  "name": "deno-console",
+  "version": "0.1.0",
+  "description": "",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "lint": "biome check --apply-unsafe  ./",
+    "format": "biome format --write  ./",
+    "build": "esbuild ./src/index.ts --bundle --outdir=dist",
+    "tsc": "tsc",
+    "test": "pnpm run build && qjs ./dist/index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@biomejs/biome": "^1.5.1",
+    "esbuild": "^0.19.11",
+    "typescript": "^5.3.3"
+  }
+}
