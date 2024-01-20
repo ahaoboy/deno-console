@@ -1348,9 +1348,9 @@ export default (noColor: () => boolean) => {
     const output = []
     for (let i = 0; i < len; i++) {
       // Special handle sparse arrays.
-      if (!ObjectHasOwn(value, i)) {
-        return formatSpecialArray(ctx, value, recurseTimes, len, output, i)
-      }
+      // if (!ObjectHasOwn(value, i)) {
+      //   return formatSpecialArray(ctx, value, recurseTimes, len, output, i)
+      // }
       ArrayPrototypePush(
         output,
         formatProperty(ctx, value, recurseTimes, i, kArrayType),
@@ -1396,8 +1396,8 @@ export default (noColor: () => boolean) => {
       } catch (err) {
         assert(
           isNativeError(err) &&
-            err.name === "ReferenceError" &&
-            isModuleNamespaceObject(value),
+          err.name === "ReferenceError" &&
+          isModuleNamespaceObject(value),
         )
         keys = ObjectGetOwnPropertyNames(value)
       }
@@ -1474,9 +1474,8 @@ export default (noColor: () => boolean) => {
       output[i] = elementFormatter(ctx.stylize, value[i])
     }
     if (remaining > 0) {
-      output[maxLength] = `... ${remaining} more item${
-        remaining > 1 ? "s" : ""
-      }`
+      output[maxLength] = `... ${remaining} more item${remaining > 1 ? "s" : ""
+        }`
     }
     if (ctx.showHidden) {
       // .buffer goes last, it's not a primitive like the others.
@@ -1732,9 +1731,9 @@ export default (noColor: () => boolean) => {
     let extra = " "
     desc = desc ||
       ObjectGetOwnPropertyDescriptor(value, key) || {
-        value: value[key],
-        enumerable: true,
-      }
+      value: value[key],
+      enumerable: true,
+    }
     if (desc.value !== undefined) {
       const diff = ctx.compact !== true || type !== kObjectType ? 2 : 3
       ctx.indentationLvl += diff
@@ -2018,8 +2017,7 @@ export default (noColor: () => boolean) => {
       const indentation = `\n${StringPrototypeRepeat(" ", ctx.indentationLvl)}`
       return (
         `${base ? `${base} ` : ""}${braces[0]}${indentation}  ` +
-        `${ArrayPrototypeJoin(output, `,${indentation}  `)}${
-          ctx.trailingComma ? "," : ""
+        `${ArrayPrototypeJoin(output, `,${indentation}  `)}${ctx.trailingComma ? "," : ""
         }${indentation}${braces[1]}`
       )
     }
@@ -2784,17 +2782,17 @@ export default (noColor: () => boolean) => {
       let g_
       let b_
       if (h < 60) {
-        ;({ 0: r_, 1: g_, 2: b_ } = [c, x, 0])
+        ; ({ 0: r_, 1: g_, 2: b_ } = [c, x, 0])
       } else if (h < 120) {
-        ;({ 0: r_, 1: g_, 2: b_ } = [x, c, 0])
+        ; ({ 0: r_, 1: g_, 2: b_ } = [x, c, 0])
       } else if (h < 180) {
-        ;({ 0: r_, 1: g_, 2: b_ } = [0, c, x])
+        ; ({ 0: r_, 1: g_, 2: b_ } = [0, c, x])
       } else if (h < 240) {
-        ;({ 0: r_, 1: g_, 2: b_ } = [0, x, c])
+        ; ({ 0: r_, 1: g_, 2: b_ } = [0, x, c])
       } else if (h < 300) {
-        ;({ 0: r_, 1: g_, 2: b_ } = [x, 0, c])
+        ; ({ 0: r_, 1: g_, 2: b_ } = [x, 0, c])
       } else {
-        ;({ 0: r_, 1: g_, 2: b_ } = [c, 0, x])
+        ; ({ 0: r_, 1: g_, 2: b_ } = [c, 0, x])
       }
       return [
         MathRound((r_ + m) * 255),
@@ -3256,7 +3254,7 @@ export default (noColor: () => boolean) => {
     dir = (obj = undefined, options = {}) => {
       this.#printFunc(
         inspectArgs([obj], { ...getConsoleInspectOptions(), ...options }) +
-          "\n",
+        "\n",
         1,
       )
     }
@@ -3330,8 +3328,8 @@ export default (noColor: () => boolean) => {
       if (properties !== undefined && !ArrayIsArray(properties)) {
         throw new Error(
           "The 'properties' argument must be of type Array. " +
-            "Received type " +
-            typeof properties,
+          "Received type " +
+          typeof properties,
         )
       }
 
@@ -3372,11 +3370,11 @@ export default (noColor: () => boolean) => {
 
       const objectValues = properties
         ? ObjectFromEntries(
-            ArrayPrototypeMap(properties, (name) => [
-              name,
-              ArrayPrototypeFill(new Array(numRows), ""),
-            ]),
-          )
+          ArrayPrototypeMap(properties, (name) => [
+            name,
+            ArrayPrototypeFill(new Array(numRows), ""),
+          ]),
+        )
         : {}
       const indexKeys = []
       const values = []
@@ -3499,9 +3497,9 @@ export default (noColor: () => boolean) => {
 
     // These methods are noops, but when the inspector is connected, they
     // call into V8.
-    profile = (_label) => {}
-    profileEnd = (_label) => {}
-    timeStamp = (_label) => {}
+    profile = (_label) => { }
+    profileEnd = (_label) => { }
+    timeStamp = (_label) => { }
 
     static [SymbolHasInstance](instance) {
       return instance[isConsoleInstance]
@@ -3533,7 +3531,7 @@ export default (noColor: () => boolean) => {
    * of the original object optionally without evaluating the properties
    * in order to get the values. */
   function createFilteredInspectProxy({ object, keys, evaluate }) {
-    const obj = class {}
+    const obj = class { }
     if (object.constructor?.name) {
       ObjectDefineProperty(obj, "name", { value: object.constructor.name })
     }

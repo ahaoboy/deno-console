@@ -16,13 +16,10 @@
     "isolatedModules": false,
     "noEmit": false,
     "skipDefaultLibCheck": true,
-    "jsx": "react",
-    // "jsxFactory": "React.createElement",
-    // "jsxFragmentFactory": "React.Fragment",
     "noEmitOnError": false,
     "declarationMap": true,
     "sourceMap": true,
     "declaration": true
   },
-  "include": ["./src"]
+  "include": ["./src/index.ts"]
 }
