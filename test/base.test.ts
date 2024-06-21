@@ -1,5 +1,5 @@
 import { createConsole } from "../src"
-const Console = createConsole(() => false)
+const Console = createConsole(() => false, () => false)
 const log = (s: string) => globalThis.console.log(s.slice(0, -1))
 const console = new Console(log)
 console.log(1)

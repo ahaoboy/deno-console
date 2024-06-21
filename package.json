@@ -1,13 +1,13 @@
 {
   "name": "deno-console",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "deno-console",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "lint": "biome check --apply-unsafe  ./",
     "format": "biome format --write  ./",
-    "build": "rm ./dist -rf && tsc -p ./tsconfig.json && esbuild ./src/index.ts --bundle --outdir=dist",
+    "build": "rm ./dist -rf && tsc -p ./tsconfig.json && esbuild ./src/index.ts --bundle --outdir=dist --format=esm",
     "test": "esbuild ./test/base.test.ts --bundle --outfile=./dist/index.js && qjs ./dist/index.js"
   },
   "keywords": [],
