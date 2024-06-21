@@ -2,7 +2,7 @@
 // Copyright 2018-2023 the Deno authors. All rights reserved. MIT license.
 // https://github.com/denoland/deno/blob/main/ext/console/01_console.js
 
-export default (noColor: () => boolean) => {
+export default (noColorStdout: () => boolean, noColorStderr: () => boolean) => {
   const core = globalThis.Deno.core
   const primordials = globalThis.__bootstrap.primordials
 
@@ -159,12 +159,27 @@ export default (noColor: () => boolean) => {
     Uint8Array,
   } = primordials
 
-  function setNoColorFn(fn) {
-    noColor = fn
-  }
+  // let noColorStdout = () => false
+  // let noColorStderr = () => false
 
-  function getNoColor() {
-    return noColor()
+  // function setNoColorFns(stdoutFn, stderrFn) {
+  //   noColorStdout = stdoutFn
+  //   noColorStderr = stderrFn
+  // }
+
+  // function getStdoutNoColor() {
+  //   return noColorStdout()
+  // }
+
+  // function getStderrNoColor() {
+  //   return noColorStderr()
+  // }
+
+  class AssertionError extends Error {
+    name = "AssertionError"
+    constructor(message) {
+      super(message)
+    }
   }
 
   function assert(cond, msg = "Assertion failed.") {
@@ -1347,6 +1362,7 @@ export default (noColor: () => boolean) => {
     const remaining = valLen - len
     const output = []
     for (let i = 0; i < len; i++) {
+      // TODO: qjs error
       // Special handle sparse arrays.
       // if (!ObjectHasOwn(value, i)) {
       //   return formatSpecialArray(ctx, value, recurseTimes, len, output, i)
@@ -2451,7 +2467,7 @@ export default (noColor: () => boolean) => {
 
     // node only
     maxArrayLength: 100,
-    maxStringLength: 100, // deno: strAbbreviateSize: 100
+    maxStringLength: 10_000, // deno: strAbbreviateSize: 10_000
     customInspect: true,
 
     // deno only
@@ -2479,7 +2495,7 @@ export default (noColor: () => boolean) => {
 
   const DEFAULT_INDENT = "  " // Default indent string
 
-  const STR_ABBREVIATE_SIZE = 100
+  const STR_ABBREVIATE_SIZE = 10_000
 
   class CSI {
     static kClear = "\x1b[1;1H"
@@ -3057,9 +3073,10 @@ export default (noColor: () => boolean) => {
     return ansi
   }
 
-  function inspectArgs(args, inspectOptions = {}) {
+  function inspectArgs(args, inspectOptions = { __proto__: null }) {
     const ctx = {
       ...getDefaultInspectOptions(),
+      colors: inspectOptions.colors ?? !noColorStdout(),
       ...inspectOptions,
     }
     if (inspectOptions.iterableLimit !== undefined) {
@@ -3072,7 +3089,7 @@ export default (noColor: () => boolean) => {
     if (ctx.maxArrayLength === null) ctx.maxArrayLength = Infinity
     if (ctx.maxStringLength === null) ctx.maxStringLength = Infinity
 
-    const noColor = getNoColor()
+    const noColor = !ctx.colors
     const first = args[0]
     let a = 0
     let string = ""
@@ -3184,12 +3201,14 @@ export default (noColor: () => boolean) => {
   const timerMap = new SafeMap()
   const isConsoleInstance = Symbol("isConsoleInstance")
 
-  function getConsoleInspectOptions() {
-    const color = !getNoColor()
+  /** @param noColor {boolean} */
+  function getConsoleInspectOptions(noColor) {
     return {
       ...getDefaultInspectOptions(),
-      colors: color,
-      stylize: color ? createStylizeWithColor(styles, colors) : stylizeNoColor,
+      colors: !noColor,
+      stylize: noColor
+        ? stylizeNoColor
+        : createStylizeWithColor(styles, colors),
     }
   }
 
@@ -3197,7 +3216,7 @@ export default (noColor: () => boolean) => {
     #printFunc = null;
     [isConsoleInstance] = false
 
-    constructor(printFunc: (s: string) => void) {
+    constructor(printFunc) {
       this.#printFunc = printFunc
       this.indentLevel = 0
       this[isConsoleInstance] = true
@@ -3224,7 +3243,7 @@ export default (noColor: () => boolean) => {
     log = (...args) => {
       this.#printFunc(
         inspectArgs(args, {
-          ...getConsoleInspectOptions(),
+          ...getConsoleInspectOptions(noColorStdout()),
           indentLevel: this.indentLevel,
         }) + "\n",
         1,
@@ -3234,7 +3253,7 @@ export default (noColor: () => boolean) => {
     debug = (...args) => {
       this.#printFunc(
         inspectArgs(args, {
-          ...getConsoleInspectOptions(),
+          ...getConsoleInspectOptions(noColorStdout()),
           indentLevel: this.indentLevel,
         }) + "\n",
         0,
@@ -3244,17 +3263,19 @@ export default (noColor: () => boolean) => {
     info = (...args) => {
       this.#printFunc(
         inspectArgs(args, {
-          ...getConsoleInspectOptions(),
+          ...getConsoleInspectOptions(noColorStdout()),
           indentLevel: this.indentLevel,
         }) + "\n",
         1,
       )
     }
 
-    dir = (obj = undefined, options = {}) => {
+    dir = (obj = undefined, options = { __proto__: null }) => {
       this.#printFunc(
-        inspectArgs([obj], { ...getConsoleInspectOptions(), ...options }) +
-        "\n",
+        inspectArgs([obj], {
+          ...getConsoleInspectOptions(noColorStdout()),
+          ...options,
+        }) + "\n",
         1,
       )
     }
@@ -3264,7 +3285,7 @@ export default (noColor: () => boolean) => {
     warn = (...args) => {
       this.#printFunc(
         inspectArgs(args, {
-          ...getConsoleInspectOptions(),
+          ...getConsoleInspectOptions(noColorStderr()),
           indentLevel: this.indentLevel,
         }) + "\n",
         2,
@@ -3274,7 +3295,7 @@ export default (noColor: () => boolean) => {
     error = (...args) => {
       this.#printFunc(
         inspectArgs(args, {
-          ...getConsoleInspectOptions(),
+          ...getConsoleInspectOptions(noColorStderr()),
           indentLevel: this.indentLevel,
         }) + "\n",
         3,
@@ -3355,7 +3376,7 @@ export default (noColor: () => boolean) => {
         resultData = [...new SafeSetIterator(data)]
       } else if (isMapObject) {
         let idx = 0
-        resultData = {}
+        resultData = { __proto__: null }
 
         MapPrototypeForEach(data, (v, k) => {
           resultData[idx] = { Key: k, Values: v }
@@ -3484,7 +3505,7 @@ export default (noColor: () => boolean) => {
 
     trace = (...args) => {
       const message = inspectArgs(args, {
-        ...getConsoleInspectOptions(),
+        ...getConsoleInspectOptions(noColorStderr()),
         indentLevel: 0,
       })
       const err = {
@@ -3508,7 +3529,7 @@ export default (noColor: () => boolean) => {
 
   const customInspect = SymbolFor("Deno.customInspect")
 
-  function inspect(value, inspectOptions = {}) {
+  function inspect(value, inspectOptions = { __proto__: null }) {
     // Default options
     const ctx = {
       ...getDefaultInspectOptions(),

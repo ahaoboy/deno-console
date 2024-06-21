@@ -1,7 +1,7 @@
 import initCore from "./00_core"
 import initConsole from "./01_console"
 
-export function createConsole(noCOlor = () => true) {
+export function createConsole(noColorStdout = () => true, noColorStderr = () => false) {
   initCore()
-  return initConsole(noCOlor)
+  return initConsole(noColorStdout, noColorStderr)
 }
