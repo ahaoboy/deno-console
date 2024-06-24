@@ -12,3 +12,7 @@ console.log(Promise.resolve(1))
 const a: any = [1]
 a[1] = a;
 console.log(a)
+
+// TODO: qjs not support Object.hasOwn
+// console.log(typeof Object.hasOwn)
+// console.table(["apples", "oranges", "bananas"]);
