@@ -8,3 +8,7 @@ console.log(new Map())
 console.log(new Set())
 console.log(new Proxy({ a: 1 }, {}))
 console.log(Promise.resolve(1))
+
+const a: any = [1]
+a[1] = a;
+console.log(a)
